@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/axis/static/css/main.e6c13ad2.css",
+    "main.js": "/axis/static/js/main.44f09e03.js",
+    "static/js/592.6739f2a6.chunk.js": "/axis/static/js/592.6739f2a6.chunk.js",
+    "index.html": "/axis/index.html",
+    "main.e6c13ad2.css.map": "/axis/static/css/main.e6c13ad2.css.map",
+    "main.44f09e03.js.map": "/axis/static/js/main.44f09e03.js.map",
+    "592.6739f2a6.chunk.js.map": "/axis/static/js/592.6739f2a6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.44f09e03.js"
+  ]
+}
