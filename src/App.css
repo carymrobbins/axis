@@ -1,0 +1,18 @@
+.app {
+    padding-left: 0.5em;
+}
+
+.playing-now {
+    padding-left: 2em;
+}
+
+.playing-now .player input {
+    font-size: 2em;
+}
+
+.playing-now .vs {
+    padding-left: 0.5em;
+    font-size: 2em;
+    font-style: italic;
+    font-weight: bold;
+}

@@ -1,13 +1,27 @@
 import React, {useState} from 'react';
 import './App.css';
 
+const STATE_LOCAL_STORAGE_KEY = "axis-state-7b9cd0fa-ab0a-4409-8622-bbbf21895be7"
+
 class State {
+
   readonly newPlayer: string;
   readonly queue: Array<string>;
 
   constructor(newPlayer: string = "", queue: Array<string> = []) {
     this.newPlayer = newPlayer
     this.queue = queue
+  }
+
+  static load(serialized: string | null): State {
+    if (serialized === null) {
+      return new State()
+    }
+    return new State('', JSON.parse(serialized))
+  }
+
+  serialize(): string {
+    return JSON.stringify(this.queue)
   }
 
   withNewPlayer(newPlayer: string): State {
@@ -30,7 +44,12 @@ class State {
 
 function App() {
 
-  const [state, setState] = useState(new State())
+  const [state, unsafeSetState] = useState(State.load(localStorage.getItem(STATE_LOCAL_STORAGE_KEY)))
+
+  const setState = (s: State) => {
+    localStorage.setItem(STATE_LOCAL_STORAGE_KEY, s.serialize())
+    return unsafeSetState(s)
+  }
 
   const declareWinner = (i: number) => {
     switch (i) {
@@ -45,9 +64,20 @@ function App() {
     }
   }
 
+  const mkPlayerButton = (i: number) => {
+    const player = state.queue.at(i)
+    if (player !== undefined) {
+      return (
+        <input type="button" value={player} onClick={(e) =>
+          declareWinner(i)
+        }/>
+      )
+    }
+  }
+
   return (
     <>
-      <div>
+      <div className="app">
         <h1>Axis</h1>
         <input type="text" placeholder="New Player"
                value={state.newPlayer}
@@ -59,15 +89,11 @@ function App() {
         <input type="button" value="Add"
                onClick={(e) => setState(state.addNewPlayer())}/>
         <h2>Playing now</h2>
-        <ul>
-          {state.queue.slice(0, 2).map((player, i) => (
-            <li>
-              <input type="button" value={player} onClick={(e) =>
-                declareWinner(i)
-              }/>
-            </li>
-          ))}
-        </ul>
+        <div className="playing-now">
+          <div className="player">{mkPlayerButton(0)}</div>
+          <div className="vs">vs</div>
+          <div className="player">{mkPlayerButton(1)}</div>
+        </div>
         <h2>Queue</h2>
         <ol>
           {state.queue.slice(2).map((player) => (<li>{player}</li>))}
