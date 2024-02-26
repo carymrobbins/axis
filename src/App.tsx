@@ -6,6 +6,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const STATE_LOCAL_STORAGE_KEY = "axis-state-7b9cd0fa-ab0a-4409-8622-bbbf21895be7"
 
+enum MovePlayerDirection { UP, DOWN}
+
 class State {
 
   readonly newPlayer: string;
@@ -29,6 +31,40 @@ class State {
 
   withNewPlayer(newPlayer: string): State {
     return new State(newPlayer, this.queue)
+  }
+
+  deletePlayer(i: number): State {
+    return new State(
+      this.newPlayer,
+      [...this.queue.slice(0, i), ...this.queue.slice(i + 1)],
+    )
+  }
+
+  movePlayer(i: number, direction: MovePlayerDirection): State {
+    let player = this.queue.at(i)
+    if (player === undefined) {
+      throw Error(`Player at index ${i} does not exist!`)
+    }
+    // Clone the queue so we can mutate it.
+    let queue = [...this.queue.slice(0, i), ...this.queue.slice(i + 1)]
+    switch (direction) {
+      case MovePlayerDirection.UP:
+        if (i === 0) {
+          queue.push(player)
+        } else {
+          queue.splice(i - 1, 0, player)
+        }
+        break
+
+      case MovePlayerDirection.DOWN:
+        if (i === this.queue.length - 1) {
+          queue.splice(0, 0, player)
+        } else {
+          queue.splice(i + 1, 0, player)
+        }
+        break
+    }
+    return new State(this.newPlayer, queue)
   }
 
   withQueue(withQueue: (queue: Array<string>) => Array<string>): State {
@@ -67,15 +103,60 @@ function App() {
     }
   }
 
+  const deletePlayer = (i: number) => {
+    const player = state.queue.at(i)
+    if (player === undefined) {
+      return
+    }
+    confirmAlert({
+      title: 'Danger!',
+      message: `You are about to delete player ${player}; are you sure?`,
+      buttons: [
+        {label: 'Yes, delete', onClick: () => setState(state.deletePlayer(i))},
+        {label: "No, don't delete"},
+      ]
+    })
+  }
+
+  const movePlayer = (i: number, direction: MovePlayerDirection) => {
+    setState(state.movePlayer(i, direction))
+  }
+
+  const mkPlayerControls = (i: number) => {
+    return (
+      <>
+      <span className="delete-player"
+            onClick={(e) => deletePlayer(i)}>
+        ✖
+      </span>
+        <span className="move-player"
+              onClick={(e) => movePlayer(i, MovePlayerDirection.UP)}>
+        ▲
+      </span>
+        <span className="move-player"
+              onClick={(e) => movePlayer(i, MovePlayerDirection.DOWN)}>
+        ▼
+      </span>
+      </>
+    )
+  }
+
   const mkPlayerButton = (i: number) => {
     const player = state.queue.at(i)
     if (player === undefined) {
-      return (<span className="player-tbd">TBD</span>)
+      return (
+        <div className="player">
+          <span className="player-tbd">TBD</span>
+        </div>
+      )
     } else {
       return (
-        <input type="button" value={player} onClick={(e) =>
-          declareWinner(i)
-        }/>
+        <div className="player">
+          {mkPlayerControls(i)}
+          <input type="button" value={player} onClick={(e) =>
+            declareWinner(i)
+          }/>
+        </div>
       )
     }
   }
@@ -84,12 +165,25 @@ function App() {
     if (state.queue.length > 0) {
       return (
         <div className="playing-now">
-          <div className="player">{mkPlayerButton(0)}</div>
+          {mkPlayerButton(0)}
           <div className="vs">vs</div>
-          <div className="player">{mkPlayerButton(1)}</div>
+          {mkPlayerButton(1)}
         </div>
       )
     }
+  }
+
+  const displayQueueItems = () => {
+    return state.queue.map((player, i) =>
+      i < 2 ? (<></>) : (
+        <li>
+          {mkPlayerControls(i)}
+          <span>
+              {player}
+            </span>
+        </li>
+      )
+    )
   }
 
   const resetState = () => {
@@ -120,7 +214,7 @@ function App() {
         {mkPlayingNow()}
         <h2>Queue</h2>
         <ol>
-          {state.queue.slice(2).map((player) => (<li>{player}</li>))}
+          {displayQueueItems()}
         </ol>
         <div>
           <input className="reset-button" type="button" value="Reset"

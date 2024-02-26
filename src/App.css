@@ -15,10 +15,30 @@
 }
 
 .playing-now .vs {
-    padding-left: 0.5em;
+    padding-left: 4em;
     font-size: 2em;
     font-style: italic;
     font-weight: bold;
+}
+
+.delete-player {
+    color: red;
+    cursor: pointer;
+    padding-right: 0.1em;
+}
+
+.player .delete-player {
+    font-size: 2em;
+}
+
+.move-player {
+    color: green;
+    cursor: pointer;
+    padding-right: 0.1em;
+}
+
+.player .move-player {
+    font-size: 2em;
 }
 
 .reset-button {
