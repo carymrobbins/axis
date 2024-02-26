@@ -10,9 +10,19 @@
     font-size: 2em;
 }
 
+.player-tbd {
+    font-size: 2em;
+}
+
 .playing-now .vs {
     padding-left: 0.5em;
     font-size: 2em;
     font-style: italic;
     font-weight: bold;
+}
+
+.reset-button {
+    font-size: 1em;
+    color: white;
+    background-color: red;
 }

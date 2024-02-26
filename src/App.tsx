@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import './App.css';
+import {confirmAlert} from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 
 const STATE_LOCAL_STORAGE_KEY = "axis-state-7b9cd0fa-ab0a-4409-8622-bbbf21895be7"
 
@@ -66,13 +69,38 @@ function App() {
 
   const mkPlayerButton = (i: number) => {
     const player = state.queue.at(i)
-    if (player !== undefined) {
+    if (player === undefined) {
+      return (<span className="player-tbd">TBD</span>)
+    } else {
       return (
         <input type="button" value={player} onClick={(e) =>
           declareWinner(i)
         }/>
       )
     }
+  }
+
+  const mkPlayingNow = () => {
+    if (state.queue.length > 0) {
+      return (
+        <div className="playing-now">
+          <div className="player">{mkPlayerButton(0)}</div>
+          <div className="vs">vs</div>
+          <div className="player">{mkPlayerButton(1)}</div>
+        </div>
+      )
+    }
+  }
+
+  const resetState = () => {
+    confirmAlert({
+      title: 'Danger!',
+      message: 'You are about to erase your current game state; are you sure?',
+      buttons: [
+        {label: 'Yes, destroy!', onClick: () => setState(new State())},
+        {label: 'Oh whoops, no'},
+      ]
+    })
   }
 
   return (
@@ -89,15 +117,15 @@ function App() {
         <input type="button" value="Add"
                onClick={(e) => setState(state.addNewPlayer())}/>
         <h2>Playing now</h2>
-        <div className="playing-now">
-          <div className="player">{mkPlayerButton(0)}</div>
-          <div className="vs">vs</div>
-          <div className="player">{mkPlayerButton(1)}</div>
-        </div>
+        {mkPlayingNow()}
         <h2>Queue</h2>
         <ol>
           {state.queue.slice(2).map((player) => (<li>{player}</li>))}
         </ol>
+        <div>
+          <input className="reset-button" type="button" value="Reset"
+                 onClick={(e) => resetState()}/>
+        </div>
       </div>
     </>
   );
